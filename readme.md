@@ -165,7 +165,7 @@ I18n.loadPoFile(Locale("Japanese (Kansai)","jp_ka"), kansaiJapanese
 ## Installation
 
 build.sbt example:
-TODO NOT RELEASED YET
+
 ```scala
 libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.1"
 ```
