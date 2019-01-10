@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/fbaierl/scalajs-i18n-rx.svg?branch=master)](https://travis-ci.org/fbaierl/scalajs-i18n-rx)
+
 # scalajs-i18n-rx
 
 *Change the language of your entire web app with one line of code*:
