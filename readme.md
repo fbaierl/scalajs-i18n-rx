@@ -51,11 +51,6 @@ I18n.changeLanguage(Locale.de)
 #### Custom Locales: 
 
 ```scala
-import scalatags.JsDom.all._
-import scalatags.rx.all._
-import com.github.fbaierl.i18nrx._
-import rx.Ctx.Owner.Unsafe._
-
 val standardJapanese = """
 msgid "Really?"
 msgstr "本当？"
@@ -73,7 +68,6 @@ I18n.loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
 #### Plurals 
 
 ```scala
-
 import scalatags.JsDom.all._
 import scalatags.rx.all._
 import com.github.fbaierl.i18nrx._
@@ -97,13 +91,13 @@ val singularP = p(singular).render
 val plural = String.format(I18n.t("I have one apple", "I have {0} apples", 2), new Integer(2))
 val pluralP = p(plural).render
 
-println(singularP.outerHTML) // &lt;p>I have one apple&lt;/p>
-println(pluralP.outerHTML) // &lt;p>I have {0} apples&lt;/p>
+println(singularP.innerHTML) // "I have one apple"
+println(pluralP.innerHTML) // "I have {0} apples"
 
 I18n.changeLanguage(Locale.fr)
 
-println(singularP.outerHTML) //&lt;p>J'ai une pomme&lt;/p>
-println(pluralP.outerHTML) // &lt;p>J'ai {0} pommes&lt;/p>
+println(singularP.innerHTML) // "J'ai une pomme"
+println(pluralP.innerHTML) // "J'ai {0} pommes"
 ```
 
 If the number deciding which the plural form will be used (`n`) itself is an `Rx`, the usage can get a bit tricky:
