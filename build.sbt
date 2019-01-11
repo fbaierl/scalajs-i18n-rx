@@ -4,7 +4,7 @@ name := "scalajs-i18n-rx"
 organization := "com.github.fbaierl"
 version := "0.1"
 scalaVersion := "2.12.6"
-crossScalaVersions := List("2.12.6, 2.12.4, 2.12.3")
+crossScalaVersions := List("2.12.6", "2.12.4", "2.12.3")
 
 libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.6.7"
 libraryDependencies += "com.timushev" %%% "scalatags-rx" % "0.3.0"
