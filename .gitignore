@@ -9,3 +9,5 @@ target/
 /.idea/
 /.idea_modules/
 bin/
+package-lock.json
+node_modules/

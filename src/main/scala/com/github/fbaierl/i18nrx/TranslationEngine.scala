@@ -8,6 +8,8 @@ import rx.Ctx.Owner.Unsafe._
 
 case class TranslationEngine() {
 
+  private[i18nrx] var defaultPluralDetector: Long => Boolean = n => n != 1
+
   private[i18nrx] val defaultLanguage = Locale.en
 
   private[i18nrx] val activeLanguage: Var[Locale] = Var(defaultLanguage)
@@ -39,7 +41,20 @@ case class TranslationEngine() {
     i18ns.get(activeLanguage.now).map(_.tc(ctx, singular)).getOrElse(singular)
 
   private[i18nrx] def tcn(context: String, singular: String, plural: String, n: Long): String =
-    i18ns.get(activeLanguage.now).map(_.tcn(context, singular, plural, n)).getOrElse(singular)
+    i18ns.get(activeLanguage.now).map(_.tcn(context, singular, plural, n))
+      .getOrElse(if(defaultPluralDetector(n)) plural else singular)
+
+  private[i18nrx] def tcn(context: String, singular: String, plural: String, n: Rx[Long]): String = {
+    n.triggerLater {
+      /*
+       * If n changes, the whole translation has to be refreshed since it may affect whether a plural or a singular form
+       * is displayed.
+       */
+      reactives get (context, singular) foreach (r => r.recalc())
+    }
+    i18ns.get(activeLanguage.now).map(_.tcn(context, singular, plural, n.now))
+      .getOrElse(if(defaultPluralDetector(n.now)) plural else singular)
+  }
 
   private def refreshReactives(): Unit = reactives.values.foreach(_.recalc())
 

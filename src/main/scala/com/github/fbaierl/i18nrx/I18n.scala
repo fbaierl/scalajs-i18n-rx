@@ -41,6 +41,7 @@ object I18n {
   def defaultLanguage: Locale = Locale.en
 
   /**
+    * Translates a singular.
     * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
     *       of `tr(...).now` so that the value gets updated automatically.
     * @param singular the text to translate
@@ -50,8 +51,9 @@ object I18n {
     engine createReactive("", singular, () => engine tc("", singular))
 
   /**
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * Translates a singular.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param context the context of the text to translate
     * @param singular the text to translate
     * @return a reactive wrapping a translatable singular text determined by a context
@@ -60,8 +62,9 @@ object I18n {
     engine createReactive(context, singular, () => engine tc(context, singular))
 
   /**
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * Translates a plural.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
     * @param n count for the plural
@@ -71,8 +74,21 @@ object I18n {
     engine createReactive("", singular, () => engine tcn("", singular, plural, n))
 
   /**
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * Translates a plural. Automatically updates the DOM element if n is updated.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural (a Rx)
+    * @return a reactive wrapping a translatable plural text
+    */
+  def trx(singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
+    engine createReactive("", singular, () => engine tcn("", singular, plural, n))
+
+  /**
+    * Translates a plural with context.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param context the context of the text to translate
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
@@ -83,12 +99,27 @@ object I18n {
     engine createReactive(context, singular, () => engine tcn(context, singular, plural, n))
 
   /**
+    * Translates a plural with context. Automatically updates the DOM element if n is updated.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
+    * @param context the context of the text to translate
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural (a Rx)
+    * @return a reactive wrapping a translatable plural text determined by a context
+    */
+  def trx(context: String, singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] =
+    engine createReactive(context, singular, () => engine tcn(context, singular, plural, n))
+
+  /**
+    * Translates a singular.
     * @param singular the text to translate
     * @return the translated singular
     */
   def t(singular: String): String = engine tc("", singular)
 
   /**
+    * Translates a singular with context.
     * @param context the context of the text to translate
     * @param singular the text to translate
     * @return the translated singular
@@ -96,6 +127,7 @@ object I18n {
   def t(context: String, singular: String): String = engine tc(context, singular)
 
   /**
+    * Translates a plural.
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
     * @param n count for the plural
@@ -104,6 +136,7 @@ object I18n {
   def t(singular: String, plural: String, n: Long): String = engine tcn("", singular, plural, n)
 
   /**
+    * Translates a plural with context.
     * @param context the context of the text to translate
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
