@@ -256,7 +256,7 @@ def t(context: String, singular: String, plural: String, n: Long): String
 build.sbt example:
 
 ```scala
-libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.1"
+libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.2"
 ```
 
 ## License
