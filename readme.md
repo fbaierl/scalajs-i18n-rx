@@ -153,8 +153,6 @@ def defaultLanguage: Locale
 
 /**
   * Translates a singular.
-  * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-  *       of `tr(...).now` so that the value gets updated automatically.
   * @param singular the text to translate
   * @return a reactive wrapping a translatable singular text
   */
@@ -162,8 +160,6 @@ def trx(singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
 
 /**
   * Translates a singular.
-  * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-  *       of `tr(...).now` so that the value gets updated automatically.
   * @param context the context of the text to translate
   * @param singular the text to translate
   * @return a reactive wrapping a translatable singular text determined by a context
@@ -172,8 +168,6 @@ def trx(context: String, singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[
 
 /**
   * Translates a plural.
-  * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-  *       of `tr(...).now` so that the value gets updated automatically.
   * @param singular the text to translate (singular form)
   * @param plural the text to translate (plural forms)
   * @param n count for the plural
@@ -183,8 +177,6 @@ def trx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.
 
 /**
   * Translates a plural. Automatically updates the DOM element if n is updated.
-  * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-  *       of `tr(...).now` so that the value gets updated automatically.
   * @param singular the text to translate (singular form)
   * @param plural the text to translate (plural forms)
   * @param n count for the plural (a Rx)
@@ -194,8 +186,6 @@ def trx(singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner):
 
 /**
   * Translates a plural with context.
-  * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-  *       of `tr(...).now` so that the value gets updated automatically.
   * @param context the context of the text to translate
   * @param singular the text to translate (singular form)
   * @param plural the text to translate (plural forms)
@@ -206,8 +196,6 @@ def trx(context: String, singular: String, plural: String, n: Long)(implicit ctx
 
 /**
   * Translates a plural with context. Automatically updates the DOM element if n is updated.
-  * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-  *       of `tr(...).now` so that the value gets updated automatically.
   * @param context the context of the text to translate
   * @param singular the text to translate (singular form)
   * @param plural the text to translate (plural forms)

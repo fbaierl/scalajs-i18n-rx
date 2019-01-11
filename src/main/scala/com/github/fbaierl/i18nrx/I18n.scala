@@ -52,8 +52,8 @@ object I18n {
 
   /**
     * Translates a singular.
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param context the context of the text to translate
     * @param singular the text to translate
     * @return a reactive wrapping a translatable singular text determined by a context
@@ -63,8 +63,8 @@ object I18n {
 
   /**
     * Translates a plural.
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
     * @param n count for the plural
@@ -75,8 +75,8 @@ object I18n {
 
   /**
     * Translates a plural. Automatically updates the DOM element if n is updated.
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
     * @param n count for the plural (a Rx)
@@ -87,8 +87,8 @@ object I18n {
 
   /**
     * Translates a plural with context.
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param context the context of the text to translate
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
@@ -100,8 +100,8 @@ object I18n {
 
   /**
     * Translates a plural with context. Automatically updates the DOM element if n is updated.
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tr(...)()` instead
-    *       of `tr(...).now` so that the value gets updated automatically.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `trx(...)()` instead
+    *       of `trx(...).now` so that the value gets updated automatically.
     * @param context the context of the text to translate
     * @param singular the text to translate (singular form)
     * @param plural the text to translate (plural forms)
