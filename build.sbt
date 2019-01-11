@@ -10,29 +10,11 @@ libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.6.7"
 libraryDependencies += "com.timushev" %%% "scalatags-rx" % "0.3.0"
 libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.3.2"
 libraryDependencies += "com.github.fbaierl" %%% "scalajs-scaposer" % "0.1.2"
+libraryDependencies += "org.scalactic" %%% "scalactic" % "3.0.5"
+libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.5" % "test"
+// libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.0.0-M1"
 
-// publishing
-homepage := Some(url("https://github.com/fbaierl/scalajs-i18n-rx"))
-licenses += ("MIT License", url("http://www.opensource.org/licenses/mit-license.php"))
-scmInfo := Some(ScmInfo(
-  url("https://github.com/fbaierl/scalajs-i18n-rx"),
-  "scm:git:git@github.com/fbaierl/scalajs-i18n-rx.git",
-  Some("scm:git:git@github.com/fbaierl/scalajs-i18n-rx.git")))
-publishMavenStyle := true
-isSnapshot := false
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-pomExtra :=
-  <developers>
-    <developer>
-      <id>fbaierl</id>
-      <name>Florian Baierl</name>
-      <url>https://github.com/fbaierl</url>
-    </developer>
-  </developers>
-pomIncludeRepository := { _ => false }
+resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
+
+jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv
+skip in packageJSDependencies := false

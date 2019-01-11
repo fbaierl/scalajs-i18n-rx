@@ -6,7 +6,7 @@
 
 ```
 I18n.changeLanguage(Locale.de)
-````
+```
 
 **scalajs-i18n-rx** is a small internationalization library for Scala.js that combines 
 [scalatags](https://github.com/lihaoyi/scalatags), 
@@ -30,8 +30,6 @@ import scalatags.rx.all._
 import com.github.fbaierl.i18nrx._
 import rx.Ctx.Owner.Unsafe._
 
-```
-````scala
 // a minimal example of a PO file
 val dePoFile = """
 msgid "Hello World"
@@ -40,129 +38,88 @@ msgstr "Hallo Welt"
 
 // load po files
 I18n.loadPoFile(Locale.de, dePoFile)
-I18n.loadPoFile(Locale.de_CH, chPoFile)
-// 
 
 // dom creation
-div(p(I18n.tr("Hello World")))
+div(p(I18n.trx("Hello World")))
 // ...
 
 // change language
 I18n.changeLanguage(Locale.de)
 // now all previously created dom elements show the German translation
-````
+```
 
-Easily add your own custom Locales: 
+#### Custom Locales: 
 
 ```scala
+import scalatags.JsDom.all._
+import scalatags.rx.all._
+import com.github.fbaierl.i18nrx._
+import rx.Ctx.Owner.Unsafe._
+
 val standardJapanese = """
 msgid "Really?"
 msgstr "本当？"
 """
+
 val kansaiJapanese = """
 msgid "Really?"
 msgstr "ほんま？"
 """
 
-I18n.loadPoFile(Locale.jp, standardJapanese)
-I18n.loadPoFile(Locale("Japanese (Kansai)","jp_ka"), kansaiJapanese
+I18n.loadPoFile(Locale.ja, standardJapanese)
+I18n.loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
+```
+
+#### Plurals 
+
+```scala
+
+import scalatags.JsDom.all._
+import scalatags.rx.all._
+import com.github.fbaierl.i18nrx._
+import rx.Ctx.Owner.Unsafe._
+
+val frPoFile = """
+msgid ""
+msgstr "Plural-Forms: nplurals=2; plural=n>1;"
+
+msgid "I have one apple"
+msgid_plural "I have %1$s" apples"
+msgstr[0] "J'ai une pomme"
+msgstr[1] "J'ai %1$s" pommes"
+"""
+
+I18n.loadPoFile(Locale.fr, frPoFile)
+
+val singular = String.format(I18n.t("I have one apple", "I have {0} apples", 1), new Integer(1))
+val singularP = p(singular).render
+
+val plural = String.format(I18n.t("I have one apple", "I have {0} apples", 2), new Integer(2))
+val pluralP = p(plural).render
+
+println(singularP.outerHTML) // &lt;p>I have one apple&lt;/p>
+println(pluralP.outerHTML) // &lt;p>I have {0} apples&lt;/p>
+
+I18n.changeLanguage(Locale.fr)
+
+println(singularP.outerHTML) //&lt;p>J'ai une pomme&lt;/p>
+println(pluralP.outerHTML) // &lt;p>J'ai {0} pommes&lt;/p>
+```
+
+If the number deciding which the plural form will be used (`n`) itself is an `Rx`, the usage can get a bit tricky:
+
+```
+val amountOfApples = Var(new Integer(1))
+val stringFormat = Rx { I18n.t("I have one apple", "I have {0} apples", amountOfApples().toInt) }
+val element = p( Rx { String.format(stringFormat(), amountOfApples()) } ).render
+println(element.innerHTML) // "J'ai une pomme"
+amountOfApples() = new Integer(2)
+println(element.innerHTML) // "J'ai 2 pommes"
 ```
 
 ## API
 
-
-```scala
-  /**
-    * Changes the language to display.
-    * @param locale the language to display
-    */
-  def changeLanguage(locale: Locale): Unit
-
-  /**
-    * @return a set of all languages available
-    */
-  def availableLanguages: Set[Locale]
-
-  /**
-    * @return the currently active language
-    */
-  def activeLanguage: Locale
-
-  /**
-    * Loads a PO file. Adds the given language to the dictionary.
-    * If a PO file with the same [[com.github.fbaierl.i18nrx.Locale]] was loaded before, the language files are merged
-    * together
-    * @param locale the locale of the PO file
-    * @param fileContent content of the PO file
-    */
-  @throws(classOf[PoFileParseException])
-  def loadPoFile(locale: Locale, fileContent: String): Unit
-
-  /**
-    * The default language to display.
-    */
-  def defaultLanguage: Locale
-  
-  /**
-    * @param singular the text to translate
-    * @return a reactive wrapping a translatable singular text
-    */
-  def trx(singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
-
-  /**
-    * @param context the context of the text to translate
-    * @param singular the text to translate
-    * @return a reactive wrapping a translatable singular text determined by a context
-    */
-  def trx(context: String, singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
-
-  /**
-    * @param singular the text to translate (singular form)
-    * @param plural the text to translate (plural forms)
-    * @param n count for the plural
-    * @return a reactive wrapping a translatable plural text
-    */
-  def trx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
-
-  /**
-    * @param context the context of the text to translate
-    * @param singular the text to translate (singular form)
-    * @param plural the text to translate (plural forms)
-    * @param n count for the plural
-    * @return a reactive wrapping a translatable plural text determined by a context
-    */
-  def trx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String]
-
-  /**
-    * @param singular the text to translate
-    * @return the translated singular
-    */
-  def t(singular: String): String
-
-  /**
-    * @param context the context of the text to translate
-    * @param singular the text to translate
-    * @return the translated singular
-    */
-  def t(context: String, singular: String): String
-
-  /**
-    * @param singular the text to translate (singular form)
-    * @param plural the text to translate (plural forms)
-    * @param n count for the plural
-    * @return the translated plural
-    */
-  def t(singular: String, plural: String, n: Long): String
-
-  /**
-    * @param context the context of the text to translate
-    * @param singular the text to translate (singular form)
-    * @param plural the text to translate (plural forms)
-    * @param n count for the plural
-    * @return the translated plural
-    */
-  def t(context: String, singular: String, plural: String, n: Long): String
-```
+See [here](api/com/github/fbaierl/i18nrx/I18n$.html).
 
 ## Installation
 
