@@ -100,14 +100,15 @@ println(singularP.innerHTML) // "J'ai une pomme"
 println(pluralP.innerHTML) // "J'ai {0} pommes"
 ```
 
-If the number deciding which the plural form will be used (`n`) itself is an `Rx`, the usage can get a bit tricky:
+If the number deciding which plural form will be used (`n`) itself is an `Rx` it can be used directly like this:
 
 ```scala
-val amountOfApples = Var(new Integer(1))
-val stringFormat = Rx { I18n.t("I have one apple", "I have {0} apples", amountOfApples().toInt) }
-val element = p( Rx { String.format(stringFormat(), amountOfApples()) } ).render
+val amountOfApples = Var(1.toLong) // n
+val rx = I18n.trx("I have one apple", "I have {0} apples", amountOfApples)
+val element = p(Rx { String.format(rx(), amountOfApples().toString) }).render
+
 println(element.innerHTML) // "J'ai une pomme"
-amountOfApples() = new Integer(2)
+amountOfApples() = 2
 println(element.innerHTML) // "J'ai 2 pommes"
 ```
 
