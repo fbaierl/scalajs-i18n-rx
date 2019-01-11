@@ -108,7 +108,7 @@ println(pluralP.outerHTML) // &lt;p>J'ai {0} pommes&lt;/p>
 
 If the number deciding which the plural form will be used (`n`) itself is an `Rx`, the usage can get a bit tricky:
 
-```
+```scala
 val amountOfApples = Var(new Integer(1))
 val stringFormat = Rx { I18n.t("I have one apple", "I have {0} apples", amountOfApples().toInt) }
 val element = p( Rx { String.format(stringFormat(), amountOfApples()) } ).render
