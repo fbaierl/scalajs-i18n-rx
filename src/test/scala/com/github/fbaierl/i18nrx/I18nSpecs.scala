@@ -8,41 +8,43 @@ import rx.{Rx, Var}
 
 class I18nSpecs extends FlatSpec {
 
-  val po = """
-msgid ""
-msgstr "Plural-Forms: nplurals=2; plural=n>1;"
+  private val frPO =
+    """
+      |msgid ""
+      |msgstr "Plural-Forms: nplurals=2; plural=n>1;"
+      |
+      |msgid "I have one apple"
+      |msgid_plural "I have %1$s apples"
+      |msgstr[0] "J'ai une pomme"
+      |msgstr[1] "J'ai %1$s pommes"
+      |
+      |msgid "Hello world"
+      |msgstr "Bonjour monde"
+      |
+      |msgid "whoopsidaisies!"
+      |msgstr "saperlipopette!"
+      |
+      |msgid "dog"
+      |msgstr "chien"
+      |
+      |msgid "cat"
+      |msgstr "chat"
+    """.stripMargin
 
-msgid "I have one apple"
-msgid_plural "I have %1$s apples"
-msgstr[0] "J'ai une pomme"
-msgstr[1] "J'ai %1$s pommes"
 
-msgid "Hello world"
-msgstr "Bonjour monde"
+  private val dePO =
+    """
+      |msgid ""
+      |msgstr "Plural-Forms: nplurals=2; plural=n>1;"
+      |
+      |msgid "I have one apple"
+      |msgid_plural "I have %1$s apples"
+      |msgstr[0] "Ich habe einen Apfel"
+      |msgstr[1] "Ich habe %1$s Äpfel"
+    """.stripMargin
 
-msgid "whoopsidaisies!"
-msgstr "saperlipopette!"
-
-msgid "dog"
-msgstr "chien"
-
-msgid "cat"
-msgstr "chat"
-"""
-
-  val dePo = """
-msgid ""
-msgstr ""
-"Plural-Forms: nplurals=2; plural=(n!=1);\n"
-
-msgid "This rack currently carries {0} item."
-msgid_plural "This rack currently carries {0} items."
-msgstr[0] "Dieses Transportmittel trägt momentan {0} Teil."
-msgstr[1] "Dieses Transportmittel trägt momentan {0} Teile."
-"""
-
-  I18n.loadPoFile(Locale.fr, po)
-  I18n.loadPoFile(Locale.de, po)
+  I18n.loadPoFile(Locale.fr, frPO)
+  I18n.loadPoFile(Locale.de, dePO)
   I18n.changeLanguage(Locale.fr)
 
   "I18n" should "be able to translate plurals" in {
@@ -65,14 +67,24 @@ msgstr[1] "Dieses Transportmittel trägt momentan {0} Teile."
 
   it should "update to plural form if n is a reactive" in {
     val amountOfApples = Var(1.toLong)
-    val rx = I18n.trx("I have one apple", "I have {0} apples", amountOfApples)
-    val element = p(Rx { String.format(rx(), amountOfApples().toString) }).render
+    val element = p(
+      Rx {
+        val form = I18n.trx("I have one apple", "I have %1$s apples", amountOfApples)
+        String.format(form(), amountOfApples().toString) }
+    ).render
 
     assert (element.outerHTML == "<p>J'ai une pomme</p>")
+
     amountOfApples() = 2
     assert (element.outerHTML == "<p>J'ai 2 pommes</p>")
-    amountOfApples() = 1
-    assert (element.outerHTML == "<p>J'ai une pomme</p>")
+
+    I18n.changeLanguage(Locale.en)
+    assert (element.outerHTML == "<p>I have 2 apples</p>")
+
+    amountOfApples() = 3
+    I18n.changeLanguage(Locale.de)
+    assert (element.outerHTML == "<p>Ich habe 3 Äpfel</p>")
+
   }
 
   it should "automatically change dom elements" in {

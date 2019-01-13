@@ -67,49 +67,59 @@ I18n.loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
 
 #### Plurals 
 
+Working with plurals works best if the number deciding which plural form will be used (`n`) itself is an `Rx`.
+It can be used directly like this:
+
 ```scala
 import scalatags.JsDom.all._
 import scalatags.rx.all._
 import com.github.fbaierl.i18nrx._
 import rx.Ctx.Owner.Unsafe._
 
-val frPoFile = """
-msgid ""
-msgstr "Plural-Forms: nplurals=2; plural=n>1;"
+val frPO =
+  """
+    |msgid ""
+    |msgstr "Plural-Forms: nplurals=2; plural=n>1;"
+    |
+    |msgid "I have one apple"
+    |msgid_plural "I have %1$s apples"
+    |msgstr[0] "J'ai une pomme"
+    |msgstr[1] "J'ai %1$s pommes"
+  """.stripMargin
 
-msgid "I have one apple"
-msgid_plural "I have %1$s" apples"
-msgstr[0] "J'ai une pomme"
-msgstr[1] "J'ai %1$s" pommes"
-"""
-
-I18n.loadPoFile(Locale.fr, frPoFile)
-
-val singular = String.format(I18n.t("I have one apple", "I have {0} apples", 1), new Integer(1))
-val singularP = p(singular).render
-
-val plural = String.format(I18n.t("I have one apple", "I have {0} apples", 2), new Integer(2))
-val pluralP = p(plural).render
-
-println(singularP.innerHTML) // "I have one apple"
-println(pluralP.innerHTML) // "I have {0} apples"
-
+val dePO =
+  """
+    |msgid ""
+    |msgstr "Plural-Forms: nplurals=2; plural=n>1;"
+    |
+    |msgid "I have one apple"
+    |msgid_plural "I have %1$s apples"
+    |msgstr[0] "Ich habe einen Apfel"
+    |msgstr[1] "Ich habe %1$s Äpfel"
+  """.stripMargin
+  
+I18n.loadPoFile(Locale.fr, frPO)
+I18n.loadPoFile(Locale.de, dePO)
 I18n.changeLanguage(Locale.fr)
-
-println(singularP.innerHTML) // "J'ai une pomme"
-println(pluralP.innerHTML) // "J'ai {0} pommes"
-```
-
-If the number deciding which plural form will be used (`n`) itself is an `Rx` it can be used directly like this:
-
-```scala
-val amountOfApples = Var(1.toLong) // n
-val rx = I18n.trx("I have one apple", "I have {0} apples", amountOfApples)
-val element = p(Rx { String.format(rx(), amountOfApples().toString) }).render
+    
+val amountOfApples = Var(1.toLong)
+val element = p(
+  Rx {
+    val form = I18n.trx("I have one apple", "I have %1$s apples", amountOfApples)
+    String.format(form(), amountOfApples().toString) }
+).render
 
 println(element.innerHTML) // "J'ai une pomme"
+
 amountOfApples() = 2
 println(element.innerHTML) // "J'ai 2 pommes"
+
+I18n.changeLanguage(Locale.en)
+println(element.innerHTML) // "I have 2 apples"
+
+amountOfApples() = 3
+I18n.changeLanguage(Locale.de)
+println(element.innerHTML) // "Ich habe 3 Äpfel"
 ```
 
 ## API
