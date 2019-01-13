@@ -124,7 +124,7 @@ println(element.innerHTML) // "Ich habe 3 Äpfel"
 
 ### Combining PO files
 
-Multiple PO files of the same Locale can be combined:
+Multiple PO files of the same Locale can be conbined:
 
 ```scala
 
