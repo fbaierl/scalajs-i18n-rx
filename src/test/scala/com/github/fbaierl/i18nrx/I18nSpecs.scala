@@ -55,9 +55,9 @@ class I18nSpecs extends FlatSpec {
       |msgstr "%1$sが好き。"
     """.stripMargin
 
-  I18n.loadPoFile(Locale.fr, frPO)
-  I18n.loadPoFile(Locale.de, dePO)
-  I18n.changeLanguage(Locale.fr)
+  I18n loadPoFile(Locale.fr, frPO)
+  I18n loadPoFile(Locale.de, dePO)
+  I18n changeLanguage Locale.fr
 
   "I18n" should "be able to translate plurals" in {
     val singularTranslation =

@@ -5,7 +5,7 @@
 *Change the language of your entire web app with one line of code*:
 
 ```
-I18n.changeLanguage(Locale.de)
+I18n changeLanguage Locale.de
 ```
 
 **scalajs-i18n-rx** is a small internationalization library for Scala.js that combines 
@@ -18,7 +18,7 @@ I18n.changeLanguage(Locale.de)
 With **scalajs-i18n-rx** one can:
 
 - Load and combine PO files ([The format of PO files](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html))
-- Create automatically updating, localized dom elements
+- Create automatically updating, localized DOM elements
 - Change the language of an entire web app with one line of code during runtime
 
 ## Basic Usage
