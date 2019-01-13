@@ -122,6 +122,32 @@ I18n.changeLanguage(Locale.de)
 println(element.innerHTML) // "Ich habe 3 Äpfel"
 ```
 
+### Combining PO files
+
+Multiple PO files of the same Locale can be combined:
+
+```scala
+
+val japaneseSpiderPo =
+  """
+    |# an oriental species of golden orb-weaving spider
+    |msgid "nephila clavata"
+    |msgstr "女郎蜘蛛"
+  """.stripMargin
+  
+val japanesePO =
+  """
+    |msgid "I like %1$s."
+    |msgstr "%1$sが好き。"
+  """.stripMargin
+  
+I18n.loadPoFile(Locale.ja, japanesePO)
+I18n.loadPoFile(Locale.ja, japaneseSpiderPo)
+I18n.changeLanguage(Locale.ja)
+val sentence = String.format(I18n.t("I like %1$s."), I18n.t("nephila clavata"))
+println(sentence) // "女郎蜘蛛が好き。"
+```
+
 ## API
 
 ```scala

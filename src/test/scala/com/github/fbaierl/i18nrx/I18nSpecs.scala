@@ -31,7 +31,6 @@ class I18nSpecs extends FlatSpec {
       |msgstr "chat"
     """.stripMargin
 
-
   private val dePO =
     """
       |msgid ""
@@ -41,6 +40,19 @@ class I18nSpecs extends FlatSpec {
       |msgid_plural "I have %1$s apples"
       |msgstr[0] "Ich habe einen Apfel"
       |msgstr[1] "Ich habe %1$s Äpfel"
+    """.stripMargin
+
+  private val japaneseSpiderPo =
+    """
+      |# an oriental species of golden orb-weaving spider
+      |msgid "nephila clavata"
+      |msgstr "女郎蜘蛛"
+    """.stripMargin
+
+  private val japanesePO =
+    """
+      |msgid "I like %1$s."
+      |msgstr "%1$sが好き。"
     """.stripMargin
 
   I18n.loadPoFile(Locale.fr, frPO)
@@ -95,4 +107,11 @@ class I18nSpecs extends FlatSpec {
     assert (element.outerHTML == "<p title=\"saperlipopette!\">Bonjour monde</p>")
   }
 
+  it should "be able to combine po files of the same locale" in {
+    I18n.loadPoFile(Locale.ja, japanesePO)
+    I18n.loadPoFile(Locale.ja, japaneseSpiderPo)
+    I18n.changeLanguage(Locale.ja)
+    val sentence = String.format(I18n.t("I like %1$s."), I18n.t("nephila clavata"))
+    assert(sentence == "女郎蜘蛛が好き。")
+  }
 }
