@@ -5,7 +5,7 @@
 *Change the language of your entire web app with one line of code*:
 
 ```
-I18n changeLanguage Locale.de
+changeLanguage(Locale.de)
 ```
 
 **scalajs-i18n-rx** is a small internationalization library for Scala.js that combines 
@@ -27,7 +27,7 @@ With **scalajs-i18n-rx** one can:
 // First of all some necessary imports
 import scalatags.JsDom.all._
 import scalatags.rx.all._
-import com.github.fbaierl.i18nrx._
+import com.github.fbaierl.i18nrx.all._
 import rx.Ctx.Owner.Unsafe._
 
 // a minimal example of a PO file
@@ -37,14 +37,14 @@ msgstr "Hallo Welt"
 """
 
 // load po files
-I18n.loadPoFile(Locale.de, dePoFile)
+loadPoFile(Locale.de, dePoFile)
 
 // dom creation
-div(p(I18n.trx("Hello World")))
+div(p(tx("Hello World")))
 // ...
 
 // change language
-I18n.changeLanguage(Locale.de)
+changeLanguage(Locale.de)
 // now all previously created dom elements show the German translation
 ```
 
@@ -61,8 +61,8 @@ msgid "Really?"
 msgstr "ほんま？"
 """
 
-I18n.loadPoFile(Locale.ja, standardJapanese)
-I18n.loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
+loadPoFile(Locale.ja, standardJapanese)
+loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
 ```
 
 #### Plurals 
@@ -73,7 +73,7 @@ It can be used directly like this:
 ```scala
 import scalatags.JsDom.all._
 import scalatags.rx.all._
-import com.github.fbaierl.i18nrx._
+import com.github.fbaierl.i18nrx.all._
 import rx.Ctx.Owner.Unsafe._
 
 val frPO =
@@ -98,14 +98,14 @@ val dePO =
     |msgstr[1] "Ich habe %1$s Äpfel"
   """.stripMargin
   
-I18n.loadPoFile(Locale.fr, frPO)
-I18n.loadPoFile(Locale.de, dePO)
-I18n.changeLanguage(Locale.fr)
+loadPoFile(Locale.fr, frPO)
+loadPoFile(Locale.de, dePO)
+changeLanguage(Locale.fr)
     
 val amountOfApples = Var(1.toLong)
 val element = p(
   Rx {
-    val form = I18n.trx("I have one apple", "I have %1$s apples", amountOfApples)
+    val form = tnx("I have one apple", "I have %1$s apples", amountOfApples)
     String.format(form(), amountOfApples().toString) }
 ).render
 
@@ -114,17 +114,17 @@ println(element.innerHTML) // "J'ai une pomme"
 amountOfApples() = 2
 println(element.innerHTML) // "J'ai 2 pommes"
 
-I18n.changeLanguage(Locale.en)
+changeLanguage(Locale.en)
 println(element.innerHTML) // "I have 2 apples"
 
 amountOfApples() = 3
-I18n.changeLanguage(Locale.de)
+changeLanguage(Locale.de)
 println(element.innerHTML) // "Ich habe 3 Äpfel"
 ```
 
 ### Combining PO files
 
-Multiple PO files of the same Locale can be conbined:
+Multiple PO files of the same Locale can be combined:
 
 ```scala
 
@@ -141,133 +141,151 @@ val japanesePO =
     |msgstr "%1$sが好き。"
   """.stripMargin
   
-I18n.loadPoFile(Locale.ja, japanesePO)
-I18n.loadPoFile(Locale.ja, japaneseSpiderPo)
-I18n.changeLanguage(Locale.ja)
-val sentence = String.format(I18n.t("I like %1$s."), I18n.t("nephila clavata"))
+loadPoFile(Locale.ja, japanesePO)
+loadPoFile(Locale.ja, japaneseSpiderPo)
+changeLanguage(Locale.ja)
+val sentence = String.format(t("I like %1$s."), t("nephila clavata"))
 println(sentence) // "女郎蜘蛛が好き。"
 ```
 
 ## API
 
 ```scala
-/**
-  * Changes the language to display.
-  * @param locale the language to display
-  */
-def changeLanguage(locale: Locale): Unit
+  /**
+    * Changes the language to display.
+    * @param locale the language to display
+    */
+  def changeLanguage(locale: Locale): Unit = engine.activeLanguage() = locale
 
-/**
-  * @return a set of all languages available
-  */
-def availableLanguages: Set[Locale]
+  /**
+    * @return a set of all languages available
+    */
+  def availableLanguages: Set[Locale] = engine.availableLanguages.now
 
-/**
-  * @return the currently active language
-  */
-def activeLanguage: Locale
+  /**
+    * @return the currently active language
+    */
+  def activeLanguage: Locale = engine.activeLanguage.now
 
-/**
-  * Loads a PO file. Adds the given language to the dictionary.
-  * If a PO file with the same [[com.github.fbaierl.i18nrx.Locale]] was loaded before, the language files are merged
-  * together
-  * @param locale the locale of the PO file
-  * @param fileContent content of the PO file
-  */
-@throws(classOf[PoFileParseException])
-def loadPoFile(locale: Locale, fileContent: String): Unit
+  /**
+    * Loads a PO file. Adds the given language to the dictionary.
+    * If a PO file with the same [[com.github.fbaierl.i18nrx.Locale]] was loaded before, the language files are merged
+    * together
+    * @param locale the locale of the PO file
+    * @param fileContent content of the PO file
+    */
+  @throws(classOf[PoFileParseException])
+  def loadPoFile(locale: Locale, fileContent: String): Unit = engine addPoFile(locale, fileContent)
 
-/**
-  * The default language to display.
-  */
-def defaultLanguage: Locale
+  /**
+    * The default language to display.
+    */
+  def defaultLanguage: Locale = Locale.en
 
-/**
-  * Translates a singular.
-  * @param singular the text to translate
-  * @return a reactive wrapping a translatable singular text
-  */
-def trx(singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
+  /**
+    * Translates a singular.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tx(...).apply()` so that the
+    *       value gets updated automatically.
+    * @param singular the text to translate
+    * @return a reactive wrapping a translatable singular text
+    */
+  def tx(singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
+    engine createReactive("", singular, () => engine tc("", singular))
 
-/**
-  * Translates a singular.
-  * @param context the context of the text to translate
-  * @param singular the text to translate
-  * @return a reactive wrapping a translatable singular text determined by a context
-  */
-def trx(context: String, singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] 
+  /**
+    * Translates a singular.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tcx(...).apply()` so that the
+    *       value gets updated automatically.
+    * @param context the context of the text to translate
+    * @param singular the text to translate
+    * @return a reactive wrapping a translatable singular text determined by a context
+    */
+  def tcx(context: String, singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
+    engine createReactive(context, singular, () => engine tc(context, singular))
 
-/**
-  * Translates a plural.
-  * @param singular the text to translate (singular form)
-  * @param plural the text to translate (plural forms)
-  * @param n count for the plural
-  * @return a reactive wrapping a translatable plural text
-  */
-def trx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
+  /**
+    * Translates a plural.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tnx(...).apply()` so that the
+    *       value gets updated automatically.
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural
+    * @return a reactive wrapping a translatable plural text
+    */
+  def tnx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
+    engine createReactive("", singular, () => engine tcn("", singular, plural, n))
 
-/**
-  * Translates a plural. Automatically updates the DOM element if n is updated.
-  * @param singular the text to translate (singular form)
-  * @param plural the text to translate (plural forms)
-  * @param n count for the plural (a Rx)
-  * @return a reactive wrapping a translatable plural text
-  */
-def trx(singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
+  /**
+    * Translates a plural. Automatically updates the DOM element if n is updated.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tnx(...).apply()`
+    *       so that the value gets updated automatically.
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural (a Rx)
+    * @return a reactive wrapping a translatable plural text
+    */
+  def tnx(singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
+    engine createReactive("", singular, () => engine tcn("", singular, plural, n))
 
-/**
-  * Translates a plural with context.
-  * @param context the context of the text to translate
-  * @param singular the text to translate (singular form)
-  * @param plural the text to translate (plural forms)
-  * @param n count for the plural
-  * @return a reactive wrapping a translatable plural text determined by a context
-  */
-def trx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String]
+  /**
+    * Translates a plural with context.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tcnx(...).apply()` so that
+    *       the value gets updated automatically.
+    * @param context the context of the text to translate
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural
+    * @return a reactive wrapping a translatable plural text determined by a context
+    */
+  def tcnx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] =
+    engine createReactive(context, singular, () => engine tcn(context, singular, plural, n))
 
-/**
-  * Translates a plural with context. Automatically updates the DOM element if n is updated.
-  * @param context the context of the text to translate
-  * @param singular the text to translate (singular form)
-  * @param plural the text to translate (plural forms)
-  * @param n count for the plural (a Rx)
-  * @return a reactive wrapping a translatable plural text determined by a context
-  */
-def trx(context: String, singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner) : Rx.Dynamic[String]
+  /**
+    * Translates a plural with context. Automatically updates the DOM element if n is updated.
+    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tcnx(...).apply()` so that the
+    *       value gets updated automatically.
+    * @param context the context of the text to translate
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural (a Rx)
+    * @return a reactive wrapping a translatable plural text determined by a context
+    */
+  def tcnx(context: String, singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] =
+    engine createReactive(context, singular, () => engine tcn(context, singular, plural, n))
 
-/**
-  * Translates a singular.
-  * @param singular the text to translate
-  * @return the translated singular
-  */
-def t(singular: String): String
+  /**
+    * Translates a singular.
+    * @param singular the text to translate
+    * @return the translated singular
+    */
+  def t(singular: String): String = engine tc("", singular)
 
-/**
-  * Translates a singular with context.
-  * @param context the context of the text to translate
-  * @param singular the text to translate
-  * @return the translated singular
-  */
-def t(context: String, singular: String): String
+  /**
+    * Translates a singular with context.
+    * @param context the context of the text to translate
+    * @param singular the text to translate
+    * @return the translated singular
+    */
+  def tc(context: String, singular: String): String = engine tc(context, singular)
 
-/**
-  * Translates a plural.
-  * @param singular the text to translate (singular form)
-  * @param plural the text to translate (plural forms)
-  * @param n count for the plural
-  * @return the translated plural
-  */
-def t(singular: String, plural: String, n: Long): String
+  /**
+    * Translates a plural.
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural
+    * @return the translated plural
+    */
+  def tn(singular: String, plural: String, n: Long): String = engine tcn("", singular, plural, n)
 
-/**
-  * Translates a plural with context.
-  * @param context the context of the text to translate
-  * @param singular the text to translate (singular form)
-  * @param plural the text to translate (plural forms)
-  * @param n count for the plural
-  * @return the translated plural
-  */
-def t(context: String, singular: String, plural: String, n: Long): String
+  /**
+    * Translates a plural with context.
+    * @param context the context of the text to translate
+    * @param singular the text to translate (singular form)
+    * @param plural the text to translate (plural forms)
+    * @param n count for the plural
+    * @return the translated plural
+    */
+  def tcn(context: String, singular: String, plural: String, n: Long): String = engine tcn(context, singular, plural, n)
 ```
 
 ## Installation
@@ -275,8 +293,27 @@ def t(context: String, singular: String, plural: String, n: Long): String
 build.sbt example:
 
 ```scala
-libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.2"
+libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.3"
 ```
+
+## Extract i18n strings to .pot file
+
+[scala-xgettext](https://github.com/xitrum-framework/scala-xgettext) 
+can be used to extract strings to a .pot file directly from the code base:
+
+* Add this to your `build.sbt` file: 
+```
+autoCompilerPlugins := true
+addCompilerPlugin("tv.cntt" %% "xgettext" % "1.5.1")
+scalacOptions ++= Seq(
+  "com.github.fbaierl.i18nrx.I18n", "t:t", "t:tx", "tc:tc", "tc:tcx", "tn:tn", "tn:tnx", "tcn:tcn", "tcn:tcnx"
+).map("-P:xgettext:" + _)
+```
+* Clean your Scala project to force the recompilation of all Scala source code files.
+* Create an empty i18n.pot file in the current working directory.
+* Compile your project (e.g. with `fastOptJS`) like usual. The previously created .pot file will be filled
+  filled with i18n string resources extracted from compiled Scala source code files.
+
 
 ## License
 Copyright 2018 Florian Baierl
