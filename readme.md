@@ -5,7 +5,7 @@
 *Change the language of your entire web app with one line of code*:
 
 ```
-changeLanguage(Locale.de)
+I18n changeLanguage Locale.de
 ```
 
 **scalajs-i18n-rx** is a small internationalization library for Scala.js that combines 
@@ -27,7 +27,7 @@ With **scalajs-i18n-rx** one can:
 // First of all some necessary imports
 import scalatags.JsDom.all._
 import scalatags.rx.all._
-import com.github.fbaierl.i18nrx.all._
+import com.github.fbaierl.i18nrx.I18n._
 import rx.Ctx.Owner.Unsafe._
 
 // a minimal example of a PO file
@@ -37,14 +37,14 @@ msgstr "Hallo Welt"
 """
 
 // load po files
-loadPoFile(Locale.de, dePoFile)
+I18n.loadPoFile(Locale.de, dePoFile)
 
 // dom creation
 div(p(tx("Hello World")))
 // ...
 
 // change language
-changeLanguage(Locale.de)
+I18n.changeLanguage(Locale.de)
 // now all previously created dom elements show the German translation
 ```
 
@@ -61,8 +61,8 @@ msgid "Really?"
 msgstr "ほんま？"
 """
 
-loadPoFile(Locale.ja, standardJapanese)
-loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
+I18n.loadPoFile(Locale.ja, standardJapanese)
+I18n.loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
 ```
 
 #### Plurals 
@@ -73,7 +73,7 @@ It can be used directly like this:
 ```scala
 import scalatags.JsDom.all._
 import scalatags.rx.all._
-import com.github.fbaierl.i18nrx.all._
+import com.github.fbaierl.i18nrx.I18n._
 import rx.Ctx.Owner.Unsafe._
 
 val frPO =
@@ -98,9 +98,9 @@ val dePO =
     |msgstr[1] "Ich habe %1$s Äpfel"
   """.stripMargin
   
-loadPoFile(Locale.fr, frPO)
-loadPoFile(Locale.de, dePO)
-changeLanguage(Locale.fr)
+I18n.loadPoFile(Locale.fr, frPO)
+I18n.loadPoFile(Locale.de, dePO)
+I18n.changeLanguage(Locale.fr)
     
 val amountOfApples = Var(1.toLong)
 val element = p(
@@ -114,11 +114,11 @@ println(element.innerHTML) // "J'ai une pomme"
 amountOfApples() = 2
 println(element.innerHTML) // "J'ai 2 pommes"
 
-changeLanguage(Locale.en)
+I18n.changeLanguage(Locale.en)
 println(element.innerHTML) // "I have 2 apples"
 
 amountOfApples() = 3
-changeLanguage(Locale.de)
+I18n.changeLanguage(Locale.de)
 println(element.innerHTML) // "Ich habe 3 Äpfel"
 ```
 
@@ -141,9 +141,9 @@ val japanesePO =
     |msgstr "%1$sが好き。"
   """.stripMargin
   
-loadPoFile(Locale.ja, japanesePO)
-loadPoFile(Locale.ja, japaneseSpiderPo)
-changeLanguage(Locale.ja)
+I18n.loadPoFile(Locale.ja, japanesePO)
+I18n.loadPoFile(Locale.ja, japaneseSpiderPo)
+I18n.changeLanguage(Locale.ja)
 val sentence = String.format(t("I like %1$s."), t("nephila clavata"))
 println(sentence) // "女郎蜘蛛が好き。"
 ```
@@ -287,7 +287,7 @@ println(sentence) // "女郎蜘蛛が好き。"
 build.sbt example:
 
 ```scala
-libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.3"
+libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.3.1"
 ```
 
 ## Extract i18n strings to .pot file
