@@ -155,17 +155,17 @@ println(sentence) // "女郎蜘蛛が好き。"
     * Changes the language to display.
     * @param locale the language to display
     */
-  def changeLanguage(locale: Locale): Unit = engine.activeLanguage() = locale
+  def changeLanguage(locale: Locale): Unit
 
   /**
     * @return a set of all languages available
     */
-  def availableLanguages: Set[Locale] = engine.availableLanguages.now
+  def availableLanguages: Set[Locale]
 
   /**
     * @return the currently active language
     */
-  def activeLanguage: Locale = engine.activeLanguage.now
+  def activeLanguage: Locale
 
   /**
     * Loads a PO file. Adds the given language to the dictionary.
@@ -175,12 +175,12 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param fileContent content of the PO file
     */
   @throws(classOf[PoFileParseException])
-  def loadPoFile(locale: Locale, fileContent: String): Unit = engine addPoFile(locale, fileContent)
+  def loadPoFile(locale: Locale, fileContent: String): Unit
 
   /**
     * The default language to display.
     */
-  def defaultLanguage: Locale = Locale.en
+  def defaultLanguage: Locale
 
   /**
     * Translates a singular.
@@ -189,8 +189,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param singular the text to translate
     * @return a reactive wrapping a translatable singular text
     */
-  def tx(singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine createReactive("", singular, () => engine tc("", singular))
+  def tx(singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
 
   /**
     * Translates a singular.
@@ -200,8 +199,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param singular the text to translate
     * @return a reactive wrapping a translatable singular text determined by a context
     */
-  def tcx(context: String, singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine createReactive(context, singular, () => engine tc(context, singular))
+  def tcx(context: String, singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
 
   /**
     * Translates a plural.
@@ -212,8 +210,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural
     * @return a reactive wrapping a translatable plural text
     */
-  def tnx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine createReactive("", singular, () => engine tcn("", singular, plural, n))
+  def tnx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] 
 
   /**
     * Translates a plural. Automatically updates the DOM element if n is updated.
@@ -224,8 +221,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural (a Rx)
     * @return a reactive wrapping a translatable plural text
     */
-  def tnx(singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine createReactive("", singular, () => engine tcn("", singular, plural, n))
+  def tnx(singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String] 
 
   /**
     * Translates a plural with context.
@@ -237,8 +233,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural
     * @return a reactive wrapping a translatable plural text determined by a context
     */
-  def tcnx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] =
-    engine createReactive(context, singular, () => engine tcn(context, singular, plural, n))
+  def tcnx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] 
 
   /**
     * Translates a plural with context. Automatically updates the DOM element if n is updated.
@@ -250,15 +245,14 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural (a Rx)
     * @return a reactive wrapping a translatable plural text determined by a context
     */
-  def tcnx(context: String, singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] =
-    engine createReactive(context, singular, () => engine tcn(context, singular, plural, n))
+  def tcnx(context: String, singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner) : Rx.Dynamic[String]
 
   /**
     * Translates a singular.
     * @param singular the text to translate
     * @return the translated singular
     */
-  def t(singular: String): String = engine tc("", singular)
+  def t(singular: String): String
 
   /**
     * Translates a singular with context.
@@ -266,7 +260,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param singular the text to translate
     * @return the translated singular
     */
-  def tc(context: String, singular: String): String = engine tc(context, singular)
+  def tc(context: String, singular: String): String
 
   /**
     * Translates a plural.
@@ -275,7 +269,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural
     * @return the translated plural
     */
-  def tn(singular: String, plural: String, n: Long): String = engine tcn("", singular, plural, n)
+  def tn(singular: String, plural: String, n: Long): String
 
   /**
     * Translates a plural with context.
@@ -285,7 +279,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural
     * @return the translated plural
     */
-  def tcn(context: String, singular: String, plural: String, n: Long): String = engine tcn(context, singular, plural, n)
+  def tcn(context: String, singular: String, plural: String, n: Long): String
 ```
 
 ## Installation
