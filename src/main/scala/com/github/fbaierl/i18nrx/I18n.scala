@@ -2,17 +2,11 @@ package com.github.fbaierl.i18nrx
 
 import rx.{Ctx, Rx}
 
-object all extends I18n
-
-/**
-  * API
-  */
-trait I18n {
-
-  private val engine = TranslationEngine()
+object I18n extends Translator {
 
   /**
     * Changes the language to display.
+    *
     * @param locale the language to display
     */
   def changeLanguage(locale: Locale): Unit = engine.activeLanguage() = locale
@@ -31,7 +25,8 @@ trait I18n {
     * Loads a PO file. Adds the given language to the dictionary.
     * If a PO file with the same [[com.github.fbaierl.i18nrx.Locale]] was loaded before, the language files are merged
     * together
-    * @param locale the locale of the PO file
+    *
+    * @param locale      the locale of the PO file
     * @param fileContent content of the PO file
     */
   @throws(classOf[PoFileParseException])
@@ -41,6 +36,27 @@ trait I18n {
     * The default language to display.
     */
   def defaultLanguage: Locale = Locale.en
+
+  object activeLanguageChangedListeners {
+    /**
+      * Adds an observer to the active language.
+      * @param listener the callback to call when the active language changes.
+      */
+    def +=(listener: Locale => Unit): Unit = engine addOnActiveLanguageChanged listener
+  }
+
+  object availableLanguagesChangedListeners {
+    /**
+      * Adds an observer to the available languages.
+      * @param listener the callback to call when the available languages change.
+      */
+    def +=(listener: Set[Locale] => Unit): Unit = engine addOnAvailableLanguagesChanged listener
+  }
+}
+
+trait Translator {
+
+  protected val engine = TranslationEngine()
 
   /**
     * Translates a singular.

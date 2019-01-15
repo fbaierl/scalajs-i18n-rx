@@ -4,7 +4,7 @@ import org.scalatest._
 import scalatags.JsDom.all._
 import scalatags.rx.all._
 import rx.Ctx.Owner.Unsafe._
-import com.github.fbaierl.i18nrx.all._
+import com.github.fbaierl.i18nrx.I18n._
 import rx.{Rx, Var}
 
 class I18nSpecs extends FlatSpec {
@@ -56,9 +56,9 @@ class I18nSpecs extends FlatSpec {
       |msgstr "%1$sが好き。"
     """.stripMargin
 
-  loadPoFile(Locale.fr, frPO)
-  loadPoFile(Locale.de, dePO)
-  changeLanguage(Locale.fr)
+  I18n.loadPoFile(Locale.fr, frPO)
+  I18n.loadPoFile(Locale.de, dePO)
+  I18n.changeLanguage(Locale.fr)
 
   "I18n" should "be able to translate plurals" in {
     val singularTranslation =
@@ -92,28 +92,49 @@ class I18nSpecs extends FlatSpec {
     amountOfApples() = 2
     assert (element.outerHTML == "<p>J'ai 2 pommes</p>")
 
-    changeLanguage(Locale.en)
+    I18n.changeLanguage(Locale.en)
     assert (element.outerHTML == "<p>I have 2 apples</p>")
 
     amountOfApples() = 3
-    changeLanguage(Locale.de)
+    I18n.changeLanguage(Locale.de)
     assert (element.outerHTML == "<p>Ich habe 3 Äpfel</p>")
 
   }
 
   it should "automatically change dom elements" in {
-    changeLanguage(Locale.en)
+    I18n.changeLanguage(Locale.en)
     val element = p(title := tx("whoopsidaisies!"))(tx("Hello world")).render
     assert (element.outerHTML == "<p title=\"whoopsidaisies!\">Hello world</p>")
-    changeLanguage(Locale.fr)
+    I18n.changeLanguage(Locale.fr)
     assert (element.outerHTML == "<p title=\"saperlipopette!\">Bonjour monde</p>")
   }
 
   it should "be able to combine po files of the same locale" in {
-    loadPoFile(Locale.ja, japanesePO)
-    loadPoFile(Locale.ja, japaneseSpiderPo)
-    changeLanguage(Locale.ja)
+    I18n.loadPoFile(Locale.ja, japanesePO)
+    I18n.loadPoFile(Locale.ja, japaneseSpiderPo)
+    I18n.changeLanguage(Locale.ja)
     val sentence = String.format(t("I like %1$s."), t("nephila clavata"))
     assert(sentence == "女郎蜘蛛が好き。")
+  }
+
+  it should "notify observers when the active language changes" in {
+    var locale = Locale.en
+    I18n.activeLanguageChangedListeners += {
+      newLocale =>
+        locale = newLocale
+    }
+    I18n.changeLanguage(Locale.bg)
+    assert(locale === Locale.bg)
+  }
+
+  it should "notify observers when the available languages changes" in {
+    var langs = I18n.availableLanguages
+    assert (!I18n.availableLanguages.contains(Locale.ar_AE))
+    I18n.availableLanguagesChangedListeners += {
+      updatedLangs =>
+        langs = updatedLangs
+    }
+    I18n.loadPoFile(Locale.ar_AE, "")
+    assert (langs.contains(Locale.ar_AE))
   }
 }
