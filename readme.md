@@ -300,7 +300,7 @@ can be used to extract strings to a .pot file directly from the code base:
 autoCompilerPlugins := true
 addCompilerPlugin("tv.cntt" %% "xgettext" % "1.5.1")
 scalacOptions ++= Seq(
-  "com.github.fbaierl.i18nrx.I18n", "t:t", "t:tx", "tc:tc", "tc:tcx", "tn:tn", "tn:tnx", "tcn:tcn", "tcn:tcnx"
+  "com.github.fbaierl.i18nrx.Translator", "t:t", "t:tx", "tc:tc", "tc:tcx", "tn:tn", "tn:tnx", "tcn:tcn", "tcn:tcnx"
 ).map("-P:xgettext:" + _)
 ```
 * Clean your Scala project to force the recompilation of all Scala source code files.
