@@ -287,7 +287,7 @@ println(sentence) // "女郎蜘蛛が好き。"
 build.sbt example:
 
 ```scala
-libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.3.1"
+libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.4.0"
 ```
 
 ## Extract i18n strings to .pot file
