@@ -28,7 +28,8 @@ With **scalajs-i18n-rx** one can:
 import scalatags.JsDom.all._
 import scalatags.rx.all._
 import com.github.fbaierl.i18nrx.I18n._
-import rx.Ctx.Owner.Unsafe._
+
+implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
 
 // a minimal example of a PO file
 val dePoFile = """
@@ -67,27 +68,18 @@ I18n.loadPoFile(Locale("Japanese (Kansai)","ja_ka"), kansaiJapanese)
 
 #### Plurals 
 
-Working with plurals works best if the number deciding which plural form will be used (`n`) itself is an `Rx`.
+Plurals work best if the number deciding which plural form will be used (n) itself is an Rx. 
 It can be used directly like this:
 
 ```scala
 import scalatags.JsDom.all._
 import scalatags.rx.all._
 import com.github.fbaierl.i18nrx.I18n._
-import rx.Ctx.Owner.Unsafe._
+import rx.{Ctx, Rx, Var}
 
-val frPO =
-  """
-    |msgid ""
-    |msgstr "Plural-Forms: nplurals=2; plural=n>1;"
-    |
-    |msgid "I have one apple"
-    |msgid_plural "I have %1$s apples"
-    |msgstr[0] "J'ai une pomme"
-    |msgstr[1] "J'ai %1$s pommes"
-  """.stripMargin
+implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
 
-val dePO =
+private val dePO =
   """
     |msgid ""
     |msgstr "Plural-Forms: nplurals=2; plural=n>1;"
@@ -97,29 +89,20 @@ val dePO =
     |msgstr[0] "Ich habe einen Apfel"
     |msgstr[1] "Ich habe %1$s Äpfel"
   """.stripMargin
-  
-I18n.loadPoFile(Locale.fr, frPO)
-I18n.loadPoFile(Locale.de, dePO)
-I18n.changeLanguage(Locale.fr)
-    
-val amountOfApples = Var(1.toLong)
-val element = p(
-  Rx {
-    val form = tnx("I have one apple", "I have %1$s apples", amountOfApples)
-    String.format(form(), amountOfApples().toString) }
-).render
+ 
+ val amountOfApples = Var(1.toLong)
+ val stringFormat = tnx("I have one apple", "I have %1$s apples", amountOfApples)
+ val appleString = Rx { String.format(stringFormat(), amountOfApples().toString)}
+ val element = p(appleString).render
+ 
+ I18n.changeLanguage(Locale.fr)
+ assert (element.outerHTML == "<p>J'ai une pomme</p>")
+ 
+ amountOfApples() = 2.toLong
+ assert (element.outerHTML == "<p>J'ai 2 pommes</p>")
 
-println(element.innerHTML) // "J'ai une pomme"
-
-amountOfApples() = 2
-println(element.innerHTML) // "J'ai 2 pommes"
-
-I18n.changeLanguage(Locale.en)
-println(element.innerHTML) // "I have 2 apples"
-
-amountOfApples() = 3
-I18n.changeLanguage(Locale.de)
-println(element.innerHTML) // "Ich habe 3 Äpfel"
+ I18n.changeLanguage(Locale.en)
+ assert (element.outerHTML == "<p>I have 2 apples</p>")
 ```
 
 ### Combining PO files
@@ -210,18 +193,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural
     * @return a reactive wrapping a translatable plural text
     */
-  def tnx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] 
-
-  /**
-    * Translates a plural. Automatically updates the DOM element if n is updated.
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tnx(...).apply()`
-    *       so that the value gets updated automatically.
-    * @param singular the text to translate (singular form)
-    * @param plural the text to translate (plural forms)
-    * @param n count for the plural (a Rx)
-    * @return a reactive wrapping a translatable plural text
-    */
-  def tnx(singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String] 
+  def tnx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner): Rx.Dynamic[String]
 
   /**
     * Translates a plural with context.
@@ -233,19 +205,7 @@ println(sentence) // "女郎蜘蛛が好き。"
     * @param n count for the plural
     * @return a reactive wrapping a translatable plural text determined by a context
     */
-  def tcnx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] 
-
-  /**
-    * Translates a plural with context. Automatically updates the DOM element if n is updated.
-    * @note If you use this inside a `Rx { ... }` construct you most probably want to use `tcnx(...).apply()` so that the
-    *       value gets updated automatically.
-    * @param context the context of the text to translate
-    * @param singular the text to translate (singular form)
-    * @param plural the text to translate (plural forms)
-    * @param n count for the plural (a Rx)
-    * @return a reactive wrapping a translatable plural text determined by a context
-    */
-  def tcnx(context: String, singular: String, plural: String, n: Rx[Long])(implicit ctx: Ctx.Owner) : Rx.Dynamic[String]
+  def tcnx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String]
 
   /**
     * Translates a singular.

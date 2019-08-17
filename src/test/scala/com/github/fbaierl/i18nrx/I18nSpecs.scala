@@ -3,11 +3,12 @@ package com.github.fbaierl.i18nrx
 import org.scalatest._
 import scalatags.JsDom.all._
 import scalatags.rx.all._
-import rx.Ctx.Owner.Unsafe._
 import com.github.fbaierl.i18nrx.I18n._
-import rx.{Rx, Var}
+import rx.{Ctx, Rx, Var}
 
 class I18nSpecs extends FlatSpec {
+
+  implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
 
   private val frPO =
     """
@@ -70,35 +71,19 @@ class I18nSpecs extends FlatSpec {
   }
 
   it should "update to plural form if necessary" in {
-    val amountOfApples = Var(new Integer(1))
-    val stringFormat = Rx { tn("I have one apple", "I have {0} apples", amountOfApples().toInt) }
-    val element = p(Rx { String.format(stringFormat(), amountOfApples()) }).render
-    assert (element.outerHTML == "<p>J'ai une pomme</p>")
-    amountOfApples() = new Integer(2)
-    assert (element.outerHTML == "<p>J'ai 2 pommes</p>")
-  }
-
-  it should "update to plural form if n is a reactive" in {
     val amountOfApples = Var(1.toLong)
-    val element = p(
-      Rx {
-        val form = tnx("I have one apple", "I have %1$s apples", amountOfApples)
-        String.format(form(), amountOfApples().toString)
-      }
-    ).render
+    val stringFormat = tnx("I have one apple", "I have %1$s apples", amountOfApples)
+    val appleString = Rx { String.format(stringFormat(), amountOfApples().toString)}
+    val element = p(appleString).render
 
+    I18n.changeLanguage(Locale.fr)
     assert (element.outerHTML == "<p>J'ai une pomme</p>")
 
-    amountOfApples() = 2
+    amountOfApples() = 2.toLong
     assert (element.outerHTML == "<p>J'ai 2 pommes</p>")
 
     I18n.changeLanguage(Locale.en)
     assert (element.outerHTML == "<p>I have 2 apples</p>")
-
-    amountOfApples() = 3
-    I18n.changeLanguage(Locale.de)
-    assert (element.outerHTML == "<p>Ich habe 3 Äpfel</p>")
-
   }
 
   it should "automatically change dom elements" in {

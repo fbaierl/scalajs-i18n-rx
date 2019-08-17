@@ -4,7 +4,6 @@ import rx.{Ctx, Rx, Var}
 
 import scala.collection.mutable
 import com.github.fbaierl.scaposer
-import rx.Ctx.Owner.Unsafe._
 
 case class TranslationEngine() {
 
@@ -21,15 +20,19 @@ case class TranslationEngine() {
 
   private[i18nrx] val defaultLanguage = Locale.en
 
-  private[i18nrx] val activeLanguage: Var[Locale] = Var(defaultLanguage)
-  activeLanguage triggerLater {
+  private[i18nrx] var _activeLanguage: Locale = defaultLanguage
+  private[i18nrx] def activeLanguage: Locale = _activeLanguage
+  private[i18nrx] def activeLanguage_=(value: Locale) = {
+    _activeLanguage = value
     refreshReactives()
-    onActiveLanguageChangedListeners foreach { _(activeLanguage.now) }
+    onActiveLanguageChangedListeners foreach { _(activeLanguage) }
   }
 
-  private[i18nrx] val availableLanguages: Var[Set[Locale]] = Var(Set())
-  availableLanguages triggerLater {
-    onAvailableLanguagesChangedListeners foreach { _(availableLanguages.now) }
+  private[i18nrx] var _availableLanguages: Set[Locale] = Set()
+  private[i18nrx] def availableLanguages: Set[Locale] = _availableLanguages
+  private[i18nrx] def availableLanguages_=(value: Set[Locale]): Unit = {
+    _availableLanguages = value
+    onAvailableLanguagesChangedListeners foreach { _(availableLanguages) }
   }
 
   private[i18nrx] val i18ns: mutable.Map[Locale, scaposer.I18n] = mutable.Map[Locale, scaposer.I18n]()
@@ -39,37 +42,34 @@ case class TranslationEngine() {
     */
   private val reactives = mutable.Map[(String, String), Rx.Dynamic[String]]()
 
-  private[i18nrx] def createReactive(context: String, singular: String, translate: () => String)
-                                    (implicit ctx: Ctx.Owner): Rx.Dynamic[String] = {
-    val key = (context, singular)
+  private def storeReactive(key: (String, String), rx: Rx.Dynamic[String]): Rx.Dynamic[String] = {
     if(reactives.get(key).isDefined){
-      // In case this reactive already exists re-use the old one
-      reactives(key)
+      reactives(key)  // In case this reactive already exists re-use the old one
     } else {
-      val rx = Rx { translate() }
       reactives.put(key, rx)
       rx
     }
   }
 
+  private[i18nrx] def createReactive(context: String,
+                                     singular: String,
+                                     translate: () => String)
+                                    (implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
+    storeReactive((context, singular), Rx { translate() })
+
+  private[i18nrx] def createReactiveDynamicPlural(context: String,
+                                                  singular: String,
+                                                  translate: Long => String,
+                                                  nrx: Rx[Long])
+                                                 (implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
+    storeReactive((context, singular), Rx { translate(nrx()) })
+
   private[i18nrx] def tc(ctx: String, singular: String): String =
-    i18ns.get(activeLanguage.now).map(_.tc(ctx, singular)).getOrElse(singular)
+    i18ns.get(activeLanguage).map(_.tc(ctx, singular)).getOrElse(singular)
 
   private[i18nrx] def tcn(context: String, singular: String, plural: String, n: Long): String = {
-    i18ns.get(activeLanguage.now).map(_.tcn(context, singular, plural, n))
+    i18ns.get(activeLanguage).map(_.tcn(context, singular, plural, n))
       .getOrElse(if(defaultPluralDetector(n)) plural else singular)
-  }
-
-  private[i18nrx] def tcn(context: String, singular: String, plural: String, n: Rx[Long]): String = {
-    n.triggerLater {
-      /*
-       * If n changes, the whole translation has to be refreshed since it may affect whether a plural or a singular form
-       * is displayed.
-       */
-      reactives get (context, singular) foreach (r => r.recalc())
-    }
-    i18ns.get(activeLanguage.now).map(_.tcn(context, singular, plural, n.now))
-      .getOrElse(if(defaultPluralDetector(n.now)) plural else singular)
   }
 
   private def refreshReactives(): Unit = reactives.values.foreach(_.recalc())
@@ -96,8 +96,7 @@ case class TranslationEngine() {
       i18ns.put(locale, i18ns(locale) ++ i18n)
     } else {
       i18ns.put(locale, i18n)
-      availableLanguages() = i18ns.keys.toSet + defaultLanguage
-      availableLanguages.recalc()
+      availableLanguages = i18ns.keys.toSet + defaultLanguage
     }
   }
 }
