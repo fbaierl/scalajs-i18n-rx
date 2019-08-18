@@ -73,7 +73,7 @@ class I18nSpecs extends FlatSpec {
   it should "update to plural form if necessary" in {
     val amountOfApples = Var(1.toLong)
     val stringFormat = tnx("I have one apple", "I have %1$s apples", amountOfApples)
-    val appleString = Rx { String.format(stringFormat(), amountOfApples().toString)}
+    val appleString = Rx { String.format(stringFormat(), amountOfApples().toString) }
     val element = p(appleString).render
 
     I18n.changeLanguage(Locale.fr)

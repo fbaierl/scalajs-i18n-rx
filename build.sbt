@@ -2,7 +2,7 @@ enablePlugins(ScalaJSPlugin)
 
 name := "scalajs-i18n-rx"
 organization := "com.github.fbaierl"
-version := "0.4.0"
+version := "0.4.1"
 scalaVersion := "2.12.6"
 crossScalaVersions := List("2.12.6", "2.12.4", "2.12.3")
 
