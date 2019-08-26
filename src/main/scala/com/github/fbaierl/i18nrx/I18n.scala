@@ -9,7 +9,7 @@ object I18n extends Translator {
     *
     * @param locale the language to display
     */
-  def changeLanguage(locale: Locale): Unit = engine.activeLanguage = locale
+  def changeLanguage(locale: Locale): Unit = engine.changeLanguage(locale)
 
   /**
     * @return a set of all languages available
@@ -19,7 +19,7 @@ object I18n extends Translator {
   /**
     * @return the currently active language
     */
-  def activeLanguage: Locale = engine.activeLanguage
+  def activeLanguage: Locale = engine.activeLanguage.now
 
   /**
     * Loads a PO file. Adds the given language to the dictionary.
@@ -66,7 +66,7 @@ trait Translator {
     * @return a reactive wrapping a translatable singular text
     */
   def tx(singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine createReactive("", singular, () => engine tc("", singular))
+    engine createReactive((targetLanguage: Locale) => engine tc("", singular, targetLanguage))
 
   /**
     * Translates a singular.
@@ -77,7 +77,7 @@ trait Translator {
     * @return a reactive wrapping a translatable singular text determined by a context
     */
   def tcx(context: String, singular: String)(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine createReactive(context, singular, () => engine tc(context, singular))
+    engine createReactive((targetLanguage: Locale) => engine tc(context, singular, targetLanguage))
 
   /**
     * Translates a plural.  Automatically updates the DOM element if n is updated.
@@ -89,7 +89,8 @@ trait Translator {
     * @return a reactive wrapping a translatable plural text
     */
   def tnx(singular: String, plural: String, nrx: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine.createReactiveDynamicPlural("", singular, n => engine.tcn("", singular, plural, n), nrx)
+    engine.createReactiveDynamicPlural(
+      targetLanguage => n => engine.tcn("", singular, plural, n, targetLanguage), nrx)
 
   /**
     * Translates a plural with context. Automatically updates the DOM element if n is updated.
@@ -102,7 +103,8 @@ trait Translator {
     * @return a reactive wrapping a translatable plural text
     */
   def tcnx(context: String, singular: String, plural: String, nrx: Rx[Long])(implicit ctx: Ctx.Owner): Rx.Dynamic[String] =
-    engine.createReactiveDynamicPlural(context, singular, n => engine.tcn(context, singular, plural, n), nrx)
+    engine.createReactiveDynamicPlural(
+      targetLanguage => n => engine.tcn(context, singular, plural, n, targetLanguage), nrx)
 
   /**
     * Translates a plural.
@@ -114,7 +116,7 @@ trait Translator {
     * @return a reactive wrapping a translatable plural text determined by a context
     */
   def tnx(singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] =
-    engine createReactive("", singular, () => engine tcn("", singular, plural, n))
+    engine createReactive(targetLanguage => engine.tcn("", singular, plural, n, targetLanguage))
 
   /**
     * Translates a plural with context.
@@ -127,14 +129,14 @@ trait Translator {
     * @return a reactive wrapping a translatable plural text determined by a context
     */
   def tcnx(context: String, singular: String, plural: String, n: Long)(implicit ctx: Ctx.Owner) : Rx.Dynamic[String] =
-    engine createReactive(context, singular, () => engine tcn(context, singular, plural, n))
+    engine createReactive(targetLanguage => engine.tcn(context, singular, plural, n, targetLanguage))
 
   /**
     * Translates a singular.
     * @param singular the text to translate
     * @return the translated singular
     */
-  def t(singular: String): String = engine tc("", singular)
+  def t(singular: String): String = engine.tc("", singular)
 
   /**
     * Translates a singular with context.
@@ -142,7 +144,7 @@ trait Translator {
     * @param singular the text to translate
     * @return the translated singular
     */
-  def tc(context: String, singular: String): String = engine tc(context, singular)
+  def tc(context: String, singular: String): String = engine.tc(context, singular)
 
   /**
     * Translates a plural.
@@ -151,7 +153,7 @@ trait Translator {
     * @param n count for the plural
     * @return the translated plural
     */
-  def tn(singular: String, plural: String, n: Long): String = engine tcn("", singular, plural, n)
+  def tn(singular: String, plural: String, n: Long): String = engine.tcn("", singular, plural, n)
 
   /**
     * Translates a plural with context.
@@ -161,6 +163,6 @@ trait Translator {
     * @param n count for the plural
     * @return the translated plural
     */
-  def tcn(context: String, singular: String, plural: String, n: Long): String = engine tcn(context, singular, plural, n)
+  def tcn(context: String, singular: String, plural: String, n: Long): String = engine.tcn(context, singular, plural, n)
 
 }
