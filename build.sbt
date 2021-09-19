@@ -3,8 +3,8 @@ enablePlugins(ScalaJSPlugin)
 name := "scalajs-i18n-rx"
 organization := "com.github.fbaierl"
 version := "0.4.2"
-scalaVersion := "2.12.6"
-crossScalaVersions := List("2.12.6", "2.12.4", "2.12.3")
+scalaVersion := "2.12.15"
+crossScalaVersions := List("2.12.15", "2.12.4", "2.12.3")
 
 libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.6.7"
 libraryDependencies += "com.timushev" %%% "scalatags-rx" % "0.4.0"
