@@ -11,7 +11,7 @@ libraryDependencies += "com.timushev" %%% "scalatags-rx" % "0.4.0"
 libraryDependencies += "com.lihaoyi" %%% "scalarx" % "0.4.0"
 libraryDependencies += "com.github.fbaierl" %%% "scalajs-scaposer" % "0.1.2"
 libraryDependencies += "org.scalactic" %%% "scalactic" % "3.0.5"
-libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.5" % "test"
+libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.9" % "test"
 
 resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
