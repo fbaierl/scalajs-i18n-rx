@@ -4,9 +4,10 @@ import org.scalatest._
 import scalatags.JsDom.all._
 import scalatags.rx.all._
 import com.github.fbaierl.i18nrx.I18n._
+import org.scalatest.flatspec.AnyFlatSpec
 import rx.{Ctx, Rx, Var}
 
-class I18nSpecs extends FlatSpec {
+class I18nSpecs extends AnyFlatSpec {
 
   implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
 
