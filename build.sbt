@@ -4,7 +4,7 @@ name := "scalajs-i18n-rx"
 organization := "com.github.fbaierl"
 version := "0.5.0"
 scalaVersion := "2.13.6"
-crossScalaVersions := List("2.12.15", "2.12.4", "2.12.3")
+crossScalaVersions := List("2.13.6", "2.12.4", "2.12.3")
 
 resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
 
