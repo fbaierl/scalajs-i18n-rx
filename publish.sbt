@@ -6,6 +6,8 @@ scmInfo := Some(ScmInfo(
   Some("scm:git:git@github.com/fbaierl/scalajs-i18n-rx.git")))
 publishMavenStyle := true
 isSnapshot := false
+// needs credential file: ~/.sbt/sonatype_credential (use normal 'publishSigned' task)
+credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)

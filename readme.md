@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/fbaierl/scalajs-i18n-rx.svg?branch=master)](https://travis-ci.org/fbaierl/scalajs-i18n-rx) 
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.7.0.svg)](https://www.scala-js.org)
 # scalajs-i18n-rx
 
 *Change the language of your entire web app with one line of code*:
@@ -247,7 +247,7 @@ println(sentence) // "女郎蜘蛛が好き。"
 build.sbt example:
 
 ```scala
-libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.4.2"
+libraryDependencies += "com.github.fbaierl" %%% "scalajs-i18n-rx" % "0.5.0"
 ```
 
 ## Extract i18n strings to .pot file
